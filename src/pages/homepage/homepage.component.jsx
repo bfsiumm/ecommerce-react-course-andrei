@@ -2,12 +2,15 @@
 import React from 'react';
 
 import MenuDirectory from '../../components/menu-directory/menu-directory.component';
-import './homepage.styles.scss';
+
+import HomePageConatainer from './homepage.styles';
+
+//import './homepage.styles.scss';
 
 const HomePage = () => (
-    <div className='homepage'>
+    <HomePageConatainer>
         <MenuDirectory/>
-    </div>
+    </HomePageConatainer>
 )
 
 export default HomePage;
