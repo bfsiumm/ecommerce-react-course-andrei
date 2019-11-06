@@ -14,8 +14,7 @@ const config =  {
 
   firebase.initializeApp(config);
 
-  export const auth = firebase.auth();
-  export const firestore = firebase.firestore();
+  
 
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt: 'select_account'});
@@ -43,4 +42,37 @@ const config =  {
     return userRef;
   }
 
+  export const convertCollectionsSnapshotToMap = collections => {
+    const transformedCollections = collections.docs.map(collection => {
+      const { title, items } = collection.data(); 
+      return {
+        routeName: encodeURI(title.toLowerCase()),
+        id: collection.id,
+        title,
+        items
+      }
+    });
+
+    const collectionsMap = transformedCollections.reduce((accumulator, collection) => {
+      accumulator[collection.title.toLowerCase()] = collection;
+      return accumulator;
+    },{});
+    
+    return collectionsMap;
+
+
+  }
+
+  export const addCollectionAndDocuments = async (collectionName, objectsToAdd) => {
+    const collectionRef = firestore.collection(collectionName);
+    const batch = firestore.batch();
+    objectsToAdd.forEach(obj => {
+      const newDocRef = collectionRef.doc();
+      batch.set(newDocRef, obj);
+    });
+     return await batch.commit();
+  }
+
+  export const auth = firebase.auth();
+  export const firestore = firebase.firestore();
   export default firebase;

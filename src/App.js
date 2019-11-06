@@ -5,13 +5,14 @@ import { connect } from 'react-redux';
 import {  createStructuredSelector } from 'reselect';
 import { selectCurrentUser } from './redux/user/user.selector'
 import { setCurrentUser } from './redux/user/user.actions';
+import { selectCollectionsForPreview } from './redux/shop/shop.selector';
 
 import HomePage from "./pages/homepage/homepage.component";
 import Shop from './pages/shop/shop.component';
 import SinginAndSignUp from './pages/signin-and-signup/signin-and-signup.component';
 import Checkout from './pages/checkout/checkout.component';
 import Header from './components/header/header.component.jsx';
-import { auth, createUserProfileDocument } from './firebase/firebase.utils';
+import { auth, createUserProfileDocument, addCollectionAndDocuments } from './firebase/firebase.utils';
 
 
 class App extends React.Component {
@@ -19,7 +20,7 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount(){
-    const { setCurrentUser } = this.props;
+    const { setCurrentUser, collectionsArray } = this.props;
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
       if(userAuth){
         const userRef = await createUserProfileDocument(userAuth);
@@ -29,7 +30,11 @@ class App extends React.Component {
       } else {
         setCurrentUser(userAuth);
       }
-    })
+    });
+
+    // used just to populate programatically the firebase database with data: we just need to execute this once
+    // here i'm just keeping it for reference
+    //addCollectionAndDocuments('collections', collectionsArray.map(({ title, items}) => ({title, items}) ) );
   }
 
   componentWillUnmount(){
@@ -62,7 +67,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 const mapStateToProps = createStructuredSelector({
-  currentUser: selectCurrentUser
+  currentUser: selectCurrentUser,
+  collectionsArray: selectCollectionsForPreview
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
